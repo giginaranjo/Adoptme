@@ -1,0 +1,4 @@
+{"level":"error","message":"Error connecting to DB: logger is not a function","timestamp":"2024-12-24T02:41:30.081Z"}
+{"level":"error","message":"Error connecting to DB: logger.ing is not a function","timestamp":"2024-12-24T02:41:32.762Z"}
+{"level":"error","message":"Error connecting to DB: next is not a function","timestamp":"2024-12-24T02:45:43.821Z"}
+{"level":"error","message":"Error connecting to DB: logger.in is not a function","timestamp":"2024-12-24T02:46:44.328Z"}
