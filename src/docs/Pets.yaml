@@ -1,0 +1,231 @@
+paths:
+  /api/pets:
+
+    get:
+      summary: Get all pets
+      tags: 
+        - Pets
+      responses:
+        "200":
+          description: All pets were successfully obtained
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    description: Status of the request
+                  payload: 
+                    type: array
+                    description: Obtained pets
+                    items: 
+                      type: object
+                      $ref: "#/components/schemas/Pet"
+          "500":  
+            $ref: "#/components/responses/InternalServerError"
+
+    post:
+      summary: Add a new pet
+      tags: 
+        - Pets
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/requestBody/CreateOrUpdatePet"
+      responses:
+        "201":
+          description: Created pet
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    description: Status of the request
+                  payload: 
+                    type: object
+                    description: Created pet
+                    $ref: "#/components/schemas/Pet"
+        "400":
+          description: Bad request. Incomplete values.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error message 
+        "500":  
+          $ref: "#/components/responses/InternalServerError"
+
+
+  /api/pets/:pid:
+
+    put:
+          summary: Update an existing pet
+          tags: 
+            - Pets
+          parameters:
+            - in: path
+              name: pid
+              required: true
+              description: Pet ID to update
+              schema:
+                 type: string
+          requestBody:
+            required: true
+            content:
+              application/json:
+                schema:
+                  $ref: "#/components/requestBody/CreateOrUpdatePet"
+          responses:
+            "200":
+              description: Updated pet
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+                        description: Status of the request
+                      message: 
+                        type: string
+                        description: Message to inform that the pet was updated
+            "400":
+              description: Bad request. Incomplete values.
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      error:
+                        type: string
+                        description: Error message 
+            "404":
+              description: Not found.
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      error:
+                        type: string
+                        description: Error message 
+            "500":  
+              $ref: "#/components/responses/InternalServerError"
+
+    delete:
+          summary: Delete an existing pet
+          tags: 
+            - Pets
+          parameters:
+            - in: path
+              name: pid
+              required: true
+              description: Pet ID to delete
+              schema:
+                 type: string
+          responses:
+            "200":
+              description: Pet deleted
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+                        description: Status of the request
+                      message: 
+                        type: string
+                        description: Message to inform that the pet was deleted
+            "400":
+              description: Bad request. Incomplete values.
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      error:
+                        type: string
+                        description: Error message 
+            "404":
+              description: Not found.
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      error:
+                        type: string
+                        description: Error message 
+            "500":  
+              $ref: "#/components/responses/InternalServerError"
+    
+        
+  /api/pets/withimage:
+    post:
+      summary: Add a new pet with an image
+      tags: 
+        - Pets
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Pet name
+                specie:
+                  type: string
+                  description: Pet specie
+                birthDate:
+                  type: string
+                  format: date-time
+                  description: Pet's date of birth (ISO 8601 format)
+                image:
+                  type: string
+                  description: Image of the pet
+      responses:
+        "201":
+          description: Created pet
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    description: Status of the request
+                  payload: 
+                    type: object
+                    description: Created pet
+                    $ref: "#/components/schemas/Pet"
+        "400":
+          description: Bad request. Incomplete values or file.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error message 
+        "500":  
+          $ref: "#/components/responses/InternalServerError"
+        
+
+
+
+
+
+
+        

@@ -6,6 +6,6 @@ export const errorHandler = (error, req, res, next) => {
 
     } else{
         res.setHeader('Content-Type', 'application/json');
-        return res.status(500).json({error: `Unexpected server error. Try later. ${error.message}`})
+        return res.status(500).json({error: `Unexpected server error. Try later.`, message: error.message})
     }
 }

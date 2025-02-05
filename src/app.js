@@ -1,5 +1,7 @@
 import express from 'express';
 import cookieParser from 'cookie-parser';
+import swaggerJSDoc from 'swagger-jsdoc';
+import swaggerUi from 'swagger-ui-express';
 
 import usersRouter from './routes/users.router.js';
 import petsRouter from './routes/pets.router.js';
@@ -13,6 +15,20 @@ import { middLogger, logger} from './utils/index.js';
 import { errorHandler } from './middleware/errorHandler.js';
 
 const app = express();
+
+const optionsDoc = {
+    definition:{
+        openapi: "3.0.0",
+        info:{
+            title: "Documentation API",
+            version: "1.0.0",
+            description: "Documentation API"
+        }
+    },
+    apis:["./src/docs/*.yaml"]
+}
+const specs = swaggerJSDoc(optionsDoc)
+
 app.use(middLogger)
 const PORT = config.PORT||8080;
 
@@ -21,6 +37,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static("./src/public"));
 app.use(cookieParser());
 
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs))
 app.use('/api/users',usersRouter);
 app.use('/api/pets',petsRouter);
 app.use('/api/adoptions',adoptionsRouter);

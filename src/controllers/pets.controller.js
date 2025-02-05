@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import PetDTO from "../dto/Pet.dto.js";
 import { petsService } from "../services/index.js"
 import { CustomError } from "../utils/CustomError.js";
@@ -44,10 +45,29 @@ const updatePet = async (req, res, next) => {
     try {
         const petUpdateBody = req.body;
         const petId = req.params.pid;
-        const result = await petsService.update(petId, petUpdateBody);
 
-        logger.debug("Pet updated successfully")
-        res.send({ status: "success", message: "pet updated" })
+        if (!mongoose.Types.ObjectId.isValid(petId)) {
+            logger.error("Invalid pet ID");
+            CustomError.createError("Invalid pet ID", "Pet ID must be a valid number", EERRORS.INVALID_ARGUMENTS)
+        }
+
+        if (!petUpdateBody || Object.keys(petUpdateBody).length === 0 || String(Object.values(petUpdateBody)).trim() == "") {
+            logger.error("No update data provided");
+            CustomError.createError("No update data provided", "Please provide data to update the pet", EERRORS.DATA_TYPES)
+        }
+
+        const pet = await petsService.getBy({_id: petId});
+        console.log(pet);
+        
+        if (!pet) {
+            logger.error("There is no pet with the ID entered")
+            CustomError.createError("There is no pet with the ID entered", "Please verify ID and try again", EERRORS.NOT_FOUND)
+        }
+        
+        const result = await petsService.update({_id: petId}, petUpdateBody);
+
+        logger.debug("Pet successfully updated")
+        res.send({ status: "success", message: `Updated pet: ${result}` })
 
     } catch (error) {
         return next(error)
@@ -59,7 +79,19 @@ const deletePet = async (req, res, next) => {
 
     try {
         const petId = req.params.pid;
-        const result = await petsService.delete(petId);
+
+        if (!mongoose.Types.ObjectId.isValid(petId)) {
+            logger.error("Invalid pet ID");
+            CustomError.createError("Invalid pet ID", "Pet ID must be a valid number", EERRORS.INVALID_ARGUMENTS)
+        }
+        
+        const pet = await petsService.getBy({_id: petId});
+        if (!pet) {
+            logger.error("There is no pet with the ID entered")
+            CustomError.createError("There is no pet with the ID entered", "Please verify ID and try again", EERRORS.NOT_FOUND)
+        }
+
+        const result = await petsService.delete({_id: petId});
 
         logger.debug("Pet deleted successfully")
         res.send({ status: "success", message: "pet deleted" });
@@ -74,8 +106,12 @@ const createPetWithImage = async (req, res, next) => {
 
     try {
         const file = req.file;
-        const { name, specie, birthDate } = req.body;
+        if (!file) {
+            logger.error("File Missing");
+            return next(CustomError.createError("File Missing", "Please upload an image file.", EERRORS.DATA_TYPES));
+        }
 
+        const { name, specie, birthDate } = req.body;
         if (!name || !specie || !birthDate) {
             logger.error("Incomplete values")
             CustomError.createError("Incomplete values", "Complete the required fields", EERRORS.DATA_TYPES)
