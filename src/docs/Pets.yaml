@@ -23,7 +23,7 @@ paths:
                       type: object
                       $ref: "#/components/schemas/Pet"
           "500":  
-            $ref: "#/components/responses/InternalServerError"
+            $ref: "#/components/responses/GenericErrors/InternalServerError" 
 
     post:
       summary: Add a new pet
@@ -61,7 +61,7 @@ paths:
                     type: string
                     description: Error message 
         "500":  
-          $ref: "#/components/responses/InternalServerError"
+          $ref: "#/components/responses/GenericErrors/InternalServerError" 
 
 
   /api/pets/:pid:
@@ -74,9 +74,10 @@ paths:
             - in: path
               name: pid
               required: true
-              description: Pet ID to update
+              description: ID to update pet
               schema:
-                 type: string
+                type: string
+                format: mongoid
           requestBody:
             required: true
             content:
@@ -108,17 +109,9 @@ paths:
                         type: string
                         description: Error message 
             "404":
-              description: Not found.
-              content:
-                application/json:
-                  schema:
-                    type: object
-                    properties:
-                      error:
-                        type: string
-                        description: Error message 
+              $ref: "#/components/responses/GenericErrors/Notfound" 
             "500":  
-              $ref: "#/components/responses/InternalServerError"
+              $ref: "#/components/responses/GenericErrors/InternalServerError" 
 
     delete:
           summary: Delete an existing pet
@@ -128,9 +121,10 @@ paths:
             - in: path
               name: pid
               required: true
-              description: Pet ID to delete
+              description: ID to delete pet
               schema:
-                 type: string
+                type: string
+                format: mongoid
           responses:
             "200":
               description: Pet deleted
@@ -156,17 +150,9 @@ paths:
                         type: string
                         description: Error message 
             "404":
-              description: Not found.
-              content:
-                application/json:
-                  schema:
-                    type: object
-                    properties:
-                      error:
-                        type: string
-                        description: Error message 
+              $ref: "#/components/responses/GenericErrors/Notfound"
             "500":  
-              $ref: "#/components/responses/InternalServerError"
+              $ref: "#/components/responses/GenericErrors/InternalServerError" 
     
         
   /api/pets/withimage:
@@ -220,7 +206,7 @@ paths:
                     type: string
                     description: Error message 
         "500":  
-          $ref: "#/components/responses/InternalServerError"
+          $ref: "#/components/responses/GenericErrors/InternalServerError" 
         
 
 

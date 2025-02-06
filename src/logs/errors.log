@@ -18,3 +18,9 @@
 {"level":"error","message":"There is no pet with the ID entered","timestamp":"2025-02-04T06:18:50.635Z"}
 {"level":"error","message":"There is no pet with the ID entered","timestamp":"2025-02-04T06:29:17.331Z"}
 {"level":"error","message":"There is no pet with the ID entered","timestamp":"2025-02-04T06:29:42.172Z"}
+{"level":"error","message":"Incomplete values","timestamp":"2025-02-06T04:54:25.074Z"}
+{"level":"error","message":"Incomplete values","timestamp":"2025-02-06T04:54:47.205Z"}
+{"level":"error","message":"Wrong email format","timestamp":"2025-02-06T04:54:52.232Z"}
+{"level":"error","message":"Wrong email format","timestamp":"2025-02-06T04:55:08.639Z"}
+{"level":"error","message":"Wrong email format","timestamp":"2025-02-06T04:55:13.800Z"}
+{"level":"error","message":"This email is already being used with another account.","timestamp":"2025-02-06T05:38:12.464Z"}

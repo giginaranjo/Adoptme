@@ -1,7 +1,7 @@
 import { usersService } from "../services/index.js"
 import { CustomError } from "../utils/CustomError.js";
 import { EERRORS } from "../utils/EErrors.js";
-import { logger } from "../utils/index.js";
+import { createHash, logger, validEmail } from "../utils/index.js";
 
 const getAllUsers = async (req, res, next) => {
     try {
@@ -33,6 +33,38 @@ const getUser = async (req, res, next) => {
         return next(error)
     }
 
+}
+
+const createUser = async (req, res, next) => {
+
+    try {
+        let { first_name, last_name, email, password } = req.body
+
+        if (!first_name || !last_name|| !email || !password || password == " ") {
+            logger.error("Incomplete values")
+            CustomError.createError("Incomplete values", "Complete the required fields", EERRORS.DATA_TYPES)
+        }
+
+        if (!validEmail(email)) {
+            logger.error("Wrong email format")
+            CustomError.createError("Wrong email format", "Please verify email and try again", EERRORS.INVALID_ARGUMENTS)
+        }
+
+        let exist = await usersService.getUserByEmail(email)
+        if (exist) {
+            logger.error("This email is already being used with another account.")
+            CustomError.createError("This email is already being used with another account.", "Please check your email and try again or log in.", EERRORS.CONFLICT)
+        }
+
+        password = createHash(password)
+
+        let newUser = await usersService.create({ first_name, last_name, email, password })
+        
+        res.send({ status: "success", payload: newUser })
+
+    } catch (error) {
+        return next(error)
+    }
 }
 
 const updateUser = async (req, res, next) => {
@@ -76,5 +108,6 @@ export default {
     deleteUser,
     getAllUsers,
     getUser,
-    updateUser
+    updateUser, 
+    createUser
 }

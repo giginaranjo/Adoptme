@@ -1,0 +1,200 @@
+paths:
+  /api/users:
+
+    get:
+      summary: Get all users
+      tags: 
+        - Users
+      responses:
+        "200":
+          description: All users were successfully obtained
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    description: Status of the request
+                  payload: 
+                    type: array
+                    description: Obtained users
+                    items: 
+                      type: object
+                      $ref: "#/components/schemas/User"
+        "500":  
+          $ref: "#/components/responses/GenericErrors/InternalServerError" 
+
+    post:
+      summary: Add a new user
+      tags: 
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/requestBody/CreateOrUpdateUser"
+      responses:
+        "201":
+          description: Created user
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    description: Status of the request
+                  payload: 
+                    type: object
+                    description: Created user
+                    $ref: "#/components/schemas/User"
+        "400":
+          description: Bad request. This may be due to incomplete data, invalid formatting, or incorrect values.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error message 
+        "409":
+          description: Email is already in use.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error message
+        "500":  
+          $ref: "#/components/responses/GenericErrors/InternalServerError" 
+
+
+  /api/users/:pid:
+
+    get:
+      summary: Get an user
+      tags: 
+        - Users
+      parameters:
+          - in: path
+            name: pid
+            required: true
+            description: ID to get user
+            schema:
+              type: string
+              format: mongoid
+      responses:
+        "200":
+          description: User was successfully obtained
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    description: Status of the request
+                  payload: 
+                    type: array
+                    description: Obtained user
+                    items: 
+                      type: object
+                      $ref: "#/components/schemas/User"
+        "404":
+          $ref: "#/components/responses/GenericErrors/Notfound"
+        "500":  
+          $ref: "#/components/responses/GenericErrors/InternalServerError" 
+
+
+    put:
+      summary: Update an existing user
+      tags: 
+        - Users
+      parameters:
+        - in: path
+          name: pid
+          required: true
+          description: ID to update user
+          schema:
+            type: string
+            format: mongoid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/requestBody/CreateOrUpdateUser"
+        responses:
+          "200":
+            description: Updated user
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    status:
+                      type: string
+                      description: Status of the request
+                    message: 
+                      type: string
+                      description: Message to inform that the user was updated
+          "400":
+            description: Bad request. Incomplete values.
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    error:
+                      type: string
+                      description: Error message 
+          "404":
+            $ref: "#/components/responses/GenericErrors/Notfound" 
+          "500":  
+            $ref: "#/components/responses/GenericErrors/InternalServerError" 
+
+    delete:
+      summary: Delete an existing user
+      tags: 
+        - Users
+      parameters:
+        - in: path
+          name: pid
+          required: true
+          description: ID to delete user
+          schema:
+            type: string
+            format: mongoid
+      responses:
+        "200":
+          description: User deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    description: Status of the request
+                  message: 
+                    type: string
+                    description: Message to inform that the user was deleted
+        "400":
+          description: Bad request. Incomplete values.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error message 
+        "404":
+          $ref: "#/components/responses/GenericErrors/Notfound"
+        "500":  
+          $ref: "#/components/responses/GenericErrors/InternalServerError"       

@@ -13,6 +13,11 @@ const __dirname = dirname(__filename);
 export default __dirname;
 
 
+export const validEmail = (email) => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    return regex.test(email)
+}
+
 const customLevels = {
     levels: {debug: 5, http: 4, info: 3, warning: 2, error: 1, fatal: 0},
     colors: {debug: "blue", http: "magenta", info: "green", warning: "yellow", error: "red", fatal: "black"}
