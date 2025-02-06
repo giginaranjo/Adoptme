@@ -104,10 +104,51 @@ const deleteUser = async (req, res, next) => {
 
 }
 
+const uploadDocs = async (req, res, next) => {
+    
+    try {
+        const userId = req.params.uid;
+        const user = await usersService.getUserById(userId);
+
+        if (!user) {
+            logger.error("User not found");
+            CustomError.createError("User not found", "Please verify the user ID and try again", EERRORS.NOT_FOUND)
+        }
+
+        if (!req.files || req.files.length === 0) {
+            logger.error("No files uploaded");
+            CustomError.createError("No files uploaded", "Please upload at least one document.", EERRORS.DATA_TYPES)
+        }
+
+        const typesDoc = ["application/pdf", "image/png", "image/jpeg", "image/jpg", "application/msword"]
+        
+        if (!req.files.every(file => typesDoc.includes(file.mimetype))) {
+            logger.error("Invalid file type detected.");
+            CustomError.createError("Invalid file type", "Allowed types: PDF, DOCX, PNG, JPG", EERRORS.INVALID_ARGUMENTS)
+        }
+
+        const newDocs = req.files.map(file => ({
+            name: file.originalname,
+            reference: `/public/documents/${file.filename}`
+        }));
+
+        user.documents.push(...newDocs)
+
+        await usersService.update(userId, user)
+
+        logger.debug("Documents uploaded successfully");
+        res.send({ status: "success", message: "Documents uploaded"});
+
+    } catch (error) {
+        return next(error);
+    }
+};
+
 export default {
     deleteUser,
     getAllUsers,
     getUser,
     updateUser, 
-    createUser
+    createUser, 
+    uploadDocs
 }

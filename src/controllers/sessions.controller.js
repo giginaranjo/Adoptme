@@ -60,6 +60,8 @@ const login = async (req, res, next) => {
             CustomError.createError("Incorrect credentials", "Please verify the data and try again", EERRORS.UNAUTHORIZED)
         }
 
+        await usersService.update(user._id, { last_connection: new Date() });
+
         const userDto = UserDTO.getUserTokenFrom(user);
         const token = jwt.sign(userDto, 'tokenSecretJWT', { expiresIn: "1h" });
 
@@ -70,6 +72,24 @@ const login = async (req, res, next) => {
         return next(error)
     }
 }
+
+const logout = async (req, res, next) => {
+    try {
+        const cookie = req.cookies['coderCookie'];
+        if (!cookie) {
+            logger.error("No active session found");
+            CustomError.createError("Not found", "No active session found", EERRORS.UNAUTHORIZED)
+        }
+
+        const user = jwt.verify(cookie, 'tokenSecretJWT');
+        await usersService.update(user._id, { last_connection: new Date() });
+
+        res.clearCookie('coderCookie').send({ status: "success", message: "Logged out" });
+
+    } catch (error) {
+        return next(error);
+    }
+};
 
 const current = async (req, res, next) => {
     
@@ -142,5 +162,6 @@ export default {
     register,
     current,
     unprotectedLogin,
-    unprotectedCurrent
+    unprotectedCurrent,
+    logout
 }
