@@ -25,4 +25,8 @@ export default class Pet {
     delete = (id) =>{
         return petModel.findByIdAndDelete(id);
     }
+
+    deleteMany = (filter) => {
+        return petModel.deleteMany(filter);
+    }
 }

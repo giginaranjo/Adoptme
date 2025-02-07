@@ -27,4 +27,9 @@ export default class GenericRepository {
     delete = (id) =>{
         return this.dao.delete(id);
     }
+
+    deleteMany = (filter) => {
+        return this.dao.deleteMany(filter);
+    };
+    
 }

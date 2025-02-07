@@ -105,25 +105,35 @@ const deletePet = async (req, res, next) => {
 const createPetWithImage = async (req, res, next) => {
 
     try {
-        const file = req.file;
-        if (!file) {
-            logger.error("File Missing");
-            return next(CustomError.createError("File Missing", "Please upload an image file.", EERRORS.DATA_TYPES));
+        console.log(req.file);
+        
+        if (!req.file) {
+            logger.error("No files uploaded");
+            CustomError.createError("No files uploaded", "Please upload at least one document.", EERRORS.DATA_TYPES)
+        }
+console.log("hola");
+
+        const typesDoc = [ "image/png", "image/jpeg", "image/jpg"]
+        
+        if (!req.file || !typesDoc.includes(req.file.mimetype)) {
+            logger.error("Invalid file type detected.");
+            CustomError.createError("Invalid file type", "Allowed types: PNG, JPEG, JPG", EERRORS.INVALID_ARGUMENTS)
         }
 
         const { name, specie, birthDate } = req.body;
         if (!name || !specie || !birthDate) {
             logger.error("Incomplete values")
             CustomError.createError("Incomplete values", "Complete the required fields", EERRORS.DATA_TYPES)
-        }
-
-        logger.debug(file)
+        }     
+        
         const pet = PetDTO.getPetInputFrom({
             name,
             specie,
             birthDate,
-            image: `${__dirname}/../public/img/${file.filename}`
+            image:`./src/public/pets/${req.file.filename}`
         });
+        console.log(pet);
+        
         logger.debug(pet)
         const result = await petsService.create(pet);
 

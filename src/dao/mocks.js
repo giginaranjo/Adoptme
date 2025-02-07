@@ -23,7 +23,9 @@ export const mockUser = () => {
     password = createHash(password)
     let role = "user"
     let pets = []
+    let documents = []
+    let last_connection = faker.date.past()
 
-    return { first_name, last_name, email, password, role, pets }
+    return { first_name, last_name, email, password, role, pets, documents, last_connection }
 
 }

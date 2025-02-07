@@ -40,7 +40,7 @@ const createUser = async (req, res, next) => {
     try {
         let { first_name, last_name, email, password } = req.body
 
-        if (!first_name || !last_name|| !email || !password || password == " ") {
+        if (!first_name || !last_name || !email || !password || password == " ") {
             logger.error("Incomplete values")
             CustomError.createError("Incomplete values", "Complete the required fields", EERRORS.DATA_TYPES)
         }
@@ -53,13 +53,13 @@ const createUser = async (req, res, next) => {
         let exist = await usersService.getUserByEmail(email)
         if (exist) {
             logger.error("This email is already being used with another account.")
-            CustomError.createError("This email is already being used with another account.", "Please check your email and try again or log in.", EERRORS.CONFLICT)
+            CustomError.createError("Email is already in use.", "Please check your email and try again or log in.", EERRORS.CONFLICT)
         }
 
         password = createHash(password)
 
         let newUser = await usersService.create({ first_name, last_name, email, password })
-        
+
         res.send({ status: "success", payload: newUser })
 
     } catch (error) {
@@ -93,8 +93,14 @@ const deleteUser = async (req, res, next) => {
 
     try {
         const userId = req.params.uid;
-        const result = await usersService.getUserById(userId);
 
+        const user = await usersService.getUserById(userId);
+        if (!user) {
+            logger.error("There is no user with the ID entered")
+            CustomError.createError("There is no user with the ID entered", "Please verify ID and try again", EERRORS.NOT_FOUND)
+        }
+
+        const result = await usersService.delete(userId);
         logger.debug("User deleted successfully")
         res.send({ status: "success", message: "User deleted" })
 
@@ -105,7 +111,7 @@ const deleteUser = async (req, res, next) => {
 }
 
 const uploadDocs = async (req, res, next) => {
-    
+
     try {
         const userId = req.params.uid;
         const user = await usersService.getUserById(userId);
@@ -120,11 +126,16 @@ const uploadDocs = async (req, res, next) => {
             CustomError.createError("No files uploaded", "Please upload at least one document.", EERRORS.DATA_TYPES)
         }
 
-        const typesDoc = ["application/pdf", "image/png", "image/jpeg", "image/jpg", "application/msword"]
-        
+        if (req.files.length > 5) {
+            logger.error("File limit exceeded");
+            CustomError.createError("File limit exceeded", "You cannot upload more than 5 files.", EERRORS.DATA_TYPES)
+        }
+
+        const typesDoc = ["application/pdf", "application/msword"]
+
         if (!req.files.every(file => typesDoc.includes(file.mimetype))) {
             logger.error("Invalid file type detected.");
-            CustomError.createError("Invalid file type", "Allowed types: PDF, DOCX, PNG, JPG", EERRORS.INVALID_ARGUMENTS)
+            CustomError.createError("Invalid file type", "Allowed types: PDF, DOCX", EERRORS.INVALID_ARGUMENTS)
         }
 
         const newDocs = req.files.map(file => ({
@@ -137,7 +148,7 @@ const uploadDocs = async (req, res, next) => {
         await usersService.update(userId, user)
 
         logger.debug("Documents uploaded successfully");
-        res.send({ status: "success", message: "Documents uploaded"});
+        res.send({ status: "success", message: "Documents uploaded" });
 
     } catch (error) {
         return next(error);
@@ -148,7 +159,7 @@ export default {
     deleteUser,
     getAllUsers,
     getUser,
-    updateUser, 
-    createUser, 
+    updateUser,
+    createUser,
     uploadDocs
 }
